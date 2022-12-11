@@ -1,24 +1,19 @@
 import tkinter as tk
 
 
-#Распознание символов
-def symbol(i):
-    if i == '⌫':
-        return 'E'
-    elif i == '⅟х':
-        return 'zn'
-    elif i == 'x²':
-        return 'v_2'
-    elif i == '√х':
-        return 'k_k'
-    elif i == '±':
-        return 'neg'
-    elif i == '.':
-        return 'to'
-    elif i == '=':
-        return 'rav'
-    else:
-        return i
+#Стереть всё
+def Delete_0(Del):
+    calc_etry.delete(0, tk.END)
+    calc_etry.insert(0, '0')
+
+#Стерать последний элемент
+def Delete_1(Del):
+    entry = calc_etry.get()
+    entry = entry[:-1]
+    if len(entry) == 0:
+        entry = '0'
+    calc_etry.delete(0, tk.END)
+    calc_etry.insert(0, entry)
 
 #Сложение !!!САША!!!
 def add_pl(x, y):
@@ -158,6 +153,10 @@ for i in but1:
         tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: sq(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
     elif i == '√х':
         tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: sq_r(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
+    elif i == 'C':
+        tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: Delete_0(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
+    elif i == '⌫':
+        tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: Delete_1(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
     else:
         tk.Button(calc, text=i, bd=3, font=('Arial', 13)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
 
