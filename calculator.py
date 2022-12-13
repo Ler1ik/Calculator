@@ -6,6 +6,7 @@ def Delete_0(Del):
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, '0')
 
+
 #Стерать последний элемент
 def Delete_1(Del):
     entry = calc_etry.get()
@@ -66,8 +67,8 @@ def add_calculation_1(S, x, y):
 
 #Pасчёт_0; Разбиваем строку на 2 числа и символ между ними
 def add_calculation_0(entry):
-    x = y = ''
-    z = ''
+    x, y = 0, ''
+    S = ''
     a = []
     while entry != '':
         i = len(entry) - 1
@@ -83,33 +84,50 @@ def add_calculation_0(entry):
             y = ''
     x = float(x)
     y = float(y)
-    entry = add_calculation_1(S, x, y)
+    if S != '':
+        entry = add_calculation_1(S, x, y)
+    else:
+        entry = calc_etry.get()
     return entry
 
 
 # Добавить цифру
 def add_digit(digit):
     entry = calc_etry.get()
-    if entry[0] == '0':
+    entry_0 = entry+'0'
+    if entry[0] == '0' and entry_0[1] == '0': #проверка для "."
         entry = entry[1:]
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry+digit)
 
 #Добавить знак
 def add_sign(sing):
-    entry = calc_etry.get()
-    if entry[-1] in ['+', '-', '×', '÷', '.']:
-        entry = entry[:-1]
+    entry_0 = calc_etry.get()
+    if entry_0[-1] in ['+', '-', '×', '÷', '.']:
+        entry = entry_0[:-1] + sing
+    else:
+        entry = entry_0 + sing
+    if entry[-1] in ['+', '-', '×', '÷'] and ('+' in entry[:-1] or '-' in entry[:-1] or '×' in entry[:-1] or '÷' in entry[:-1]):
+        entry = str(add_calculation_0(entry[:-1])) + entry[-1]
     calc_etry.delete(0, tk.END)
-    calc_etry.insert(0, entry+sing)
+    calc_etry.insert(0, entry)
 
 #Равно
 def equally(eq):
     entry = calc_etry.get()
+    if entry[-1] in ['+', '-', '×', '÷']:
+        entry = entry + entry[:-1]
     entry = add_calculation_0(entry)
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry)
-
+#Меню
+def menu(m):
+    menu_top = tk.Toplevel(calc)
+    #menu_top.overrideredirect(True)
+    menu_top['bg'] = '#42313A'
+    menu_top.minsize(width=320, height=500)
+    menu_top.maxsize(width=320, height=500)
+    tk.Button(menu_top, text='Игра', bd=3, font=('Arial', 13)).grid(row=0, column=0, sticky='wens', padx=2, pady=2)
 
 # Главный экран
 calc = tk.Tk()
@@ -157,6 +175,8 @@ for i in but1:
         tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: Delete_0(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
     elif i == '⌫':
         tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: Delete_1(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
+    elif i == 'M':
+        tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: menu(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
     else:
         tk.Button(calc, text=i, bd=3, font=('Arial', 13)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
 
