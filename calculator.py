@@ -2,18 +2,15 @@ import tkinter as tk
 from tkinter import messagebox
 #
 def add_magic(entry):
-    x = ''
-    s = 0
+    x = y = s = ''
     for i in range (len(entry)):
-        if s == 0:
-            if entry[i] in ['+', '-', '×', '÷']:
-                x += entry[i]
-                s += 1
-            else:
-                x += entry[i]
+        if entry[i] in ['+', '-', '×', '÷']:
+            x = y
+            y = ''
+            s = entry[i]
         else:
-            break
-    return x, s
+            y += entry[i]
+    return x, y, s
 
 #Стереть всё
 def Delete_0(Del):
@@ -23,7 +20,7 @@ def Delete_0(Del):
     calc_etry['state'] = tk.DISABLED
 
 
-#Стерать последний элемент
+#Стереть последний элемент
 def Delete_1(Del):
     entry = calc_etry.get()
     entry = entry[:-1]
@@ -34,14 +31,14 @@ def Delete_1(Del):
     calc_etry.insert(0, entry)
     calc_etry['state'] = tk.DISABLED
 
-#Стерать всё после символа операции
+#Стереть всё после символа операции
 def Delete_2(Del):
     entry = calc_etry.get()
-    entry_0, sim = add_magic(entry)
-    if sim == 0:
+    entry_0, entry_1, sim = add_magic(entry)
+    if sim == '':
         entry = '0'
     else:
-        entry = entry_0
+        entry = entry_0 + sim
     calc_etry['state'] = tk.NORMAL
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry)
@@ -49,7 +46,16 @@ def Delete_2(Del):
 
 #Противоположный элемент
 def neg(neg):
-    entry = str(int(calc_etry.get()) * (-1))
+    entry = calc_etry.get()
+    global HZ
+    HZ = 2
+    if ('+' in entry) or ('-' in entry) or ('×' in entry) or ('÷' in entry):
+        if entry[-1] in ['+', '-', '×', '÷']:
+            entry = entry + entry[:-1]
+        entry = add_calculation_0(entry)
+    entry = float(entry) * (-1)
+    if entry == int(entry):
+        entry = str(int(entry))
     calc_etry['state'] = tk.NORMAL
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry)
@@ -77,9 +83,17 @@ def add_de(x, y):
 
 #Знаменатель "⅟х"
 def denominator(denominator):
-    number = float(calc_etry.get())
+    entry = calc_etry.get()
+    global HZ
+    HZ = 1
+    if ('+' in entry) or ('-' in entry) or ('×' in entry) or ('÷' in entry):
+        if entry[-1] in ['+', '-', '×', '÷']:
+            entry = entry + entry[:-1]
+        entry = add_calculation_0(entry)
     try:
-        entry = str(1 / number)
+        entry = 1 / float(entry)
+        if entry == int(entry):
+            entry = str(int(entry))
         calc_etry['state'] = tk.NORMAL
         calc_etry.delete(0, tk.END)
         calc_etry.insert(0, entry)
@@ -93,8 +107,16 @@ def denominator(denominator):
 
 #Квадрат "x²"
 def sq(square):
-    number = float(calc_etry.get())
-    entry = str(number ** 2)
+    entry = calc_etry.get()
+    global HZ
+    HZ = 1
+    if ('+' in entry) or ('-' in entry) or ('×' in entry) or ('÷' in entry):
+        if entry[-1] in ['+', '-', '×', '÷']:
+            entry = entry + entry[:-1]
+        entry = add_calculation_0(entry)
+    entry = float(entry) ** 2
+    if entry == int(entry):
+        entry = str(int(entry))
     calc_etry['state'] = tk.NORMAL
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry)
@@ -102,8 +124,16 @@ def sq(square):
 
 #Квадратный корень "√х"
 def sq_r(square_root):
-    number = float(calc_etry.get())
-    entry = str(number ** 0.5)
+    entry = calc_etry.get()
+    global HZ
+    HZ = 1
+    if ('+' in entry) or ('-' in entry) or ('×' in entry) or ('÷' in entry):
+        if entry[-1] in ['+', '-', '×', '÷']:
+            entry = entry + entry[:-1]
+        entry = add_calculation_0(entry)
+    entry = float(entry) ** 0.5
+    if entry == int(entry):
+        entry = str(int(entry))
     calc_etry['state'] = tk.NORMAL
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry)
@@ -124,8 +154,11 @@ def add_calculation_1(S, x, y):
 #Pасчёт_0; Разбиваем строку на 2 числа и символ между ними
 def add_calculation_0(entry):
     x, y = 0, ''
-    S = ''
+    S = mod_x = ''
     a = []
+    if entry[0] == '-':
+        mod_x = '-'
+        entry = entry[1:]
     while entry != '':
         i = len(entry) - 1
         a.append(entry[i])
@@ -139,19 +172,29 @@ def add_calculation_0(entry):
             x = y
             y = ''
     x = float(x)
+    if mod_x != '':
+        x *= (-1)
     y = float(y)
     if S != '':
-        entry = add_calculation_1(S, x, y)
+        entry = float(add_calculation_1(S, x, y))
     else:
-        entry = calc_etry.get()
+        entry = float(calc_etry.get())
+    if entry == int(entry):
+        entry = int(entry)
     return str(entry)
 
 
 # Добавить цифру
 def add_digit(digit):
     entry = calc_etry.get()
+    global HZ
+    if HZ == 1:
+        entry = '0'
+        HZ = 0
     if entry[0] == '0' and len(entry) == 1:
         entry = entry[1:]
+    if (len(entry) > 1) and (entry[-1] == '0') and (entry[-2] in ['+', '-', '×', '÷']) and (digit != '.'):
+        entry = entry[:-1]
     calc_etry['state'] = tk.NORMAL
     calc_etry.delete(0, tk.END)
     calc_etry.insert(0, entry+digit)
@@ -159,6 +202,8 @@ def add_digit(digit):
 
 #Добавить знак
 def add_sign(sing):
+    global HZ
+    HZ = 0
     entry_0 = calc_etry.get()
     if sing in ['.']:
         K = 0
@@ -182,6 +227,8 @@ def add_sign(sing):
 
 #Равно
 def equally(eq):
+    global HZ
+    HZ = 1
     entry = calc_etry.get()
     if entry[-1] in ['+', '-', '×', '÷']:
         entry = entry + entry[:-1]
@@ -202,7 +249,6 @@ def menu(m):
 
 #Ввод через клавиатуру
 def press_key(event):
-    print(repr(event.char))
     if event.char.isdigit():
         add_digit(event.char)
     if event.char in ['+', '-', '*', '/', '.']:
@@ -242,7 +288,10 @@ but1 = [
     "±", "0", ".", "="
 ]
 calc.bind('<Key>', press_key)
+#Переменные
 r, c = 1, 0
+HZ = 0
+
 for i in but1:
     if i in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']:
         tk.Button(calc, text=i, bd=3, font=('Arial', 13), command=lambda v=i: add_digit(v)).grid(row=r, column=c, sticky='wens', padx=2, pady=2)
